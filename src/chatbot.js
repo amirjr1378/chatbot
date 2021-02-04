@@ -175,7 +175,6 @@ Chatbot.defaultProps = {
     "5": {
       type: "options",
       mapStateToProps: () => ({
-        title: "option show case",
         options: [{ text: "restart", trigger: "2" }],
         key: 5
       })
