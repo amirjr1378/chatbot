@@ -5,6 +5,7 @@
 import PropTypes from "prop-types";
 import React, { memo, useEffect, useState } from "react";
 import ChatItem from "./Chat/ChatItem";
+import QuestionOption from "./Chat/QuestionOption";
 
 const robotAvatar = "https://image.ibb.co/eTiXWa/avatarrobot.png";
 const secondAvatar = "https://randomuser.me/api/portraits/women/0.jpg";
@@ -85,14 +86,17 @@ const defaultRegistery = [
   },
   {
     type: "options",
-    Component: ({
+    Component: ({ title }) =>
+      title ? (
+        <ChatItem avatar={robotAvatar} isLeftSide content={title} />
+      ) : null,
+    Footer: ({
       activeKey,
       setActiveKey,
       screen,
       setScreen,
       appHistory,
       setAppHistory,
-      title,
       options
     }) => {
       const handleClick = (option) => {
@@ -105,7 +109,7 @@ const defaultRegistery = [
           newState.pop();
           newState.push(
             <ChatItem
-              key={title + appHistory.length}
+              key={option.text + appHistory.length}
               content={option.text}
               isLeftSide={false}
               avatar={secondAvatar}
@@ -118,17 +122,14 @@ const defaultRegistery = [
       };
 
       const renderOptions = options.map((option) => (
-        <button key={option.text} onClick={() => handleClick(option)}>
-          {option.text}
-        </button>
+        <QuestionOption
+          title={option.text}
+          key={option.text}
+          onClick={() => handleClick(option)}
+        />
       ));
 
-      return (
-        <div>
-          <h2>{title}</h2>
-          {renderOptions}
-        </div>
-      );
+      return <div className="option__container">{renderOptions}</div>;
     }
   }
 ];
@@ -243,16 +244,16 @@ Chatbot.defaultProps = {
         setScreen,
         appHistory,
         setAppHistory
-      ) => ({ text: "firstMessage", trigger: "2", key: 1 })
+      ) => ({ text: "start of triage", trigger: "2", key: 1 })
     },
 
     "2": {
       type: "options",
       mapStateToProps: () => ({
-        title: "option show case",
+        title: "do you have crona?",
         options: [
-          { text: "option 1", trigger: "3" },
-          { text: "option 2", trigger: "4" }
+          { text: "re", trigger: "3" },
+          { text: "ya chi", trigger: "4" }
         ],
         key: 2
       })
@@ -260,7 +261,7 @@ Chatbot.defaultProps = {
     "3": {
       type: "default",
       mapStateToProps: () => ({
-        text: "you choose option 1",
+        text: "ooof fasele begir lotfan",
         key: 3,
         trigger: "5"
       })
@@ -268,7 +269,7 @@ Chatbot.defaultProps = {
     "4": {
       type: "default",
       mapStateToProps: () => ({
-        text: "you choose option 2",
+        text: "khosh be halet",
         key: 4,
         trigger: "5"
       })
@@ -277,8 +278,8 @@ Chatbot.defaultProps = {
       type: "options",
       mapStateToProps: () => ({
         options: [
-          { text: "restart", trigger: "2" },
-          { text: "input text showcase", trigger: "6" }
+          { text: "restart", trigger: "2" }
+          // { text: "input text showcase", trigger: "6" }
         ],
         key: 5
       })
