@@ -1,5 +1,5 @@
 import Chatbot from "./chatbot";
-import "./styles.css";
+import "./styles.sass";
 
 export default function App() {
   return <Chatbot />;

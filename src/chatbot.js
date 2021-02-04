@@ -4,7 +4,10 @@
 
 import PropTypes from "prop-types";
 import React, { memo, useEffect, useState } from "react";
+import ChatItem from "./Chat/ChatItem";
 
+const robotAvatar = "https://image.ibb.co/eTiXWa/avatarrobot.png";
+const secondAvatar = "https://randomuser.me/api/portraits/women/0.jpg";
 const defaultRegistery = [
   {
     type: "default",
@@ -22,7 +25,7 @@ const defaultRegistery = [
         if (trigger) setTimeout(() => setActiveKey(trigger), 300);
       }, [trigger]);
 
-      return <div>{text}</div>;
+      return <ChatItem isLeftSide content={text} avatar={robotAvatar} />;
     }
   },
   {
@@ -46,7 +49,12 @@ const defaultRegistery = [
           let newState = [...state];
           newState.pop();
           newState.push(
-            <div key={title + appHistory.length}>{option.text}</div>
+            <ChatItem
+              key={title + appHistory.length}
+              content={option.text}
+              isLeftSide={false}
+              avatar={secondAvatar}
+            />
           );
           return newState;
         });
@@ -78,6 +86,19 @@ const Chatbot = ({ steps, registery, initialStepKey }) => {
   const [appHistory, setAppHistory] = useState([]); // keep track of steps that has been passed
   const [textInputValue, setTextInputValue] = useState(""); // when input needed
   const allRegistery = defaultRegistery.concat(registery);
+
+  const scrollToBottom = () => {
+    const bottomScrollTag = document.querySelector("#bottom-scroll");
+    if (bottomScrollTag)
+      bottomScrollTag.scrollIntoView({
+        behavior: "smooth",
+        block: "end"
+      });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  });
 
   // when active key change screen should be updated
   useEffect(() => {
@@ -118,8 +139,11 @@ const Chatbot = ({ steps, registery, initialStepKey }) => {
   }, [activeKey]);
 
   return (
-    <div>
-      {screen}
+    <div className="chatbot__container">
+      <div className="chatbot__inner">
+        {screen}
+        <div id="bottom-scroll" />
+      </div>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -134,7 +158,14 @@ const Chatbot = ({ steps, registery, initialStepKey }) => {
               value: textInputValue
             });
           }
-          setScreen((state) => [...state, <div>{textInputValue}</div>]);
+          setScreen((state) => [
+            ...state,
+            <ChatItem
+              avatar={secondAvatar}
+              isLeftSide={false}
+              content={textInputValue}
+            />
+          ]);
           setTextInputValue("");
           if (steps[activeKey].trigger) {
             setActiveKey(steps[activeKey].trigger);
