@@ -29,6 +29,61 @@ const defaultRegistery = [
     }
   },
   {
+    type: "text-input",
+    Footer: ({
+      onSubmit,
+      trigger,
+      activeKey,
+      setActiveKey,
+      screen,
+      setScreen,
+      appHistory,
+      setAppHistory,
+      setFooter
+    }) => {
+      const [textInputValue, setTextInputValue] = useState(""); // when input needed
+
+      return (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (onSubmit) {
+              onSubmit({
+                activeKey,
+                setActiveKey,
+                screen,
+                setScreen,
+                appHistory,
+                setAppHistory,
+                value: textInputValue,
+                setFooter
+              });
+            }
+            setScreen((state) => [
+              ...state,
+              <ChatItem
+                avatar={secondAvatar}
+                isLeftSide={false}
+                content={textInputValue}
+              />
+            ]);
+            setTextInputValue("");
+            setFooter(null);
+            if (trigger) {
+              setActiveKey(trigger);
+            }
+          }}
+        >
+          <textarea
+            onChange={(e) => setTextInputValue(e.target.value)}
+            value={textInputValue}
+          />
+          <button>send</button>
+        </form>
+      );
+    }
+  },
+  {
     type: "options",
     Component: ({
       activeKey,
@@ -83,8 +138,8 @@ const Chatbot = ({ steps, registery, initialStepKey }) => {
     initialStepKey || Object.keys(steps)[0]
   ); // keep track of current step
   const [screen, setScreen] = useState([]); // all items will be rendered in screen
+  const [footer, setFooter] = useState(null); // footer like text area for messaging
   const [appHistory, setAppHistory] = useState([]); // keep track of steps that has been passed
-  const [textInputValue, setTextInputValue] = useState(""); // when input needed
   const allRegistery = defaultRegistery.concat(registery);
 
   const scrollToBottom = () => {
@@ -109,32 +164,50 @@ const Chatbot = ({ steps, registery, initialStepKey }) => {
       (reg) => reg.type === steps[activeKey].type
     );
 
-    if (newScreenRegistery && newScreenRegistery.Component) {
-      const newComponentProps = {
+    if (newScreenRegistery) {
+      let newComponentProps = {
         activeKey,
         setActiveKey,
         screen,
         setScreen,
         appHistory,
         setAppHistory,
-        ...steps[activeKey].mapStateToProps(
-          activeKey,
-          setActiveKey,
-          screen,
-          setScreen,
-          appHistory,
-          setAppHistory
-        )
+        setFooter,
+        scrollToBottom
       };
-      setScreen((state) => {
-        return [
-          ...state,
-          <newScreenRegistery.Component
+      if (steps[activeKey].mapStateToProps) {
+        newComponentProps = Object.assign(
+          newComponentProps,
+          steps[activeKey].mapStateToProps(
+            activeKey,
+            setActiveKey,
+            screen,
+            setScreen,
+            appHistory,
+            setAppHistory
+          )
+        );
+      }
+
+      if (newScreenRegistery.Footer) {
+        setFooter(
+          <newScreenRegistery.Footer
             {...newComponentProps}
-            key={newComponentProps.key + state.length}
+            key={newComponentProps.key}
           />
-        ];
-      });
+        );
+      }
+      if (newScreenRegistery.Component) {
+        setScreen((state) => {
+          return [
+            ...state,
+            <newScreenRegistery.Component
+              {...newComponentProps}
+              key={newComponentProps.key + state.length}
+            />
+          ];
+        });
+      }
     }
   }, [activeKey]);
 
@@ -144,41 +217,7 @@ const Chatbot = ({ steps, registery, initialStepKey }) => {
         {screen}
         <div id="bottom-scroll" />
       </div>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (steps[activeKey] && steps[activeKey].onSubmit) {
-            steps[activeKey].onSubmit({
-              activeKey,
-              setActiveKey,
-              screen,
-              setScreen,
-              appHistory,
-              setAppHistory,
-              value: textInputValue
-            });
-          }
-          setScreen((state) => [
-            ...state,
-            <ChatItem
-              avatar={secondAvatar}
-              isLeftSide={false}
-              content={textInputValue}
-            />
-          ]);
-          setTextInputValue("");
-          if (steps[activeKey].trigger) {
-            setActiveKey(steps[activeKey].trigger);
-          }
-        }}
-      >
-        <textarea
-          onChange={(e) => setTextInputValue(e.target.value)}
-          disabled={steps[activeKey].type !== "text-input"}
-          value={textInputValue}
-        />
-        <button disabled={steps[activeKey].type !== "text-input"}>send</button>
-      </form>
+      <div>{footer}</div>
     </div>
   );
 };
@@ -243,8 +282,10 @@ Chatbot.defaultProps = {
     },
     "6": {
       type: "text-input",
-      onSubmit: ({ value }) => console.log("here", value),
-      trigger: "5"
+      mapStateToProps: () => ({
+        onSubmit: ({ value }) => console.log("here", value),
+        trigger: "5"
+      })
     }
   }
 };
