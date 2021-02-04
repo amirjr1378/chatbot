@@ -160,6 +160,7 @@ const Chatbot = ({ steps, registery, initialStepKey }) => {
     // if active step doesnt exists
     if (!steps[activeKey]) return;
 
+    // find the correct component to attach on screen
     const newScreenRegistery = allRegistery.find(
       (reg) => reg.type === steps[activeKey].type
     );
@@ -175,6 +176,7 @@ const Chatbot = ({ steps, registery, initialStepKey }) => {
         setFooter,
         scrollToBottom
       };
+
       if (steps[activeKey].mapStateToProps) {
         newComponentProps = Object.assign(
           newComponentProps,
@@ -197,6 +199,7 @@ const Chatbot = ({ steps, registery, initialStepKey }) => {
           />
         );
       }
+
       if (newScreenRegistery.Component) {
         setScreen((state) => {
           return [
