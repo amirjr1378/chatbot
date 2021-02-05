@@ -161,6 +161,10 @@ const Chatbot = ({ steps, registery, initialStepKey }) => {
     // if active step doesnt exists
     if (!steps[activeKey]) return;
 
+    if (activeKey === "END") {
+      setFooter(null);
+    }
+
     // find the correct component to attach on screen
     const newScreenRegistery = allRegistery.find(
       (reg) => reg.type === steps[activeKey].type
