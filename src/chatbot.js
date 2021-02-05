@@ -190,6 +190,8 @@ const Chatbot = ({ steps, registery, initialStepKey }) => {
             setAppHistory
           )
         );
+      } else {
+        newComponentProps = Object.assign(newComponentProps, steps[activeKey]);
       }
 
       if (newScreenRegistery.Footer) {
