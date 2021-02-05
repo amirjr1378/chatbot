@@ -134,7 +134,7 @@ const defaultRegistery = [
   }
 ];
 
-const Chatbot = ({ steps, registery, initialStepKey }) => {
+const Chatbot = ({ steps, registery, initialStepKey, onEnd }) => {
   const [activeKey, setActiveKey] = useState(
     initialStepKey || Object.keys(steps)[0]
   ); // keep track of current step
@@ -163,6 +163,13 @@ const Chatbot = ({ steps, registery, initialStepKey }) => {
 
     if (activeKey === "END") {
       setFooter(null);
+      if (onEnd && typeof onEnd === "function")
+        onEnd({
+          appHistory,
+          setAppHistory,
+          screen,
+          setScreen
+        });
     }
 
     // find the correct component to attach on screen
