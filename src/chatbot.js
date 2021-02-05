@@ -159,8 +159,6 @@ const Chatbot = ({ steps, registery, initialStepKey, onEnd }) => {
   // when active key change screen should be updated
   useEffect(() => {
     // if active step doesnt exists
-    if (!steps[activeKey]) return;
-
     if (activeKey === "END") {
       setFooter(null);
       if (onEnd && typeof onEnd === "function")
@@ -171,6 +169,8 @@ const Chatbot = ({ steps, registery, initialStepKey, onEnd }) => {
           setScreen
         });
     }
+
+    if (!steps[activeKey]) return;
 
     // find the correct component to attach on screen
     const newScreenRegistery = allRegistery.find(
