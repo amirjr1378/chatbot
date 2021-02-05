@@ -241,12 +241,15 @@ const Chatbot = ({ steps, registery, initialStepKey, onEnd }) => {
 
 Chatbot.propTypes = {
   registery: PropTypes.array,
-  steps: PropTypes.object.isRequired
+  steps: PropTypes.object.isRequired,
+  initialStepKey: PropTypes.string,
+  onEnd: PropTypes.func
 };
 
 Chatbot.defaultProps = {
   // examples
   registery: [],
+  onEnd: () => {},
   steps: {
     "1": {
       type: "default",
